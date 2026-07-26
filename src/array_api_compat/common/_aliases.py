@@ -444,6 +444,10 @@ def permute_dims(x: Array, /, axes: tuple[int, ...], xp: Namespace) -> Array:
     return xp.transpose(x, axes)
 
 
+def _reshape_supports_copy(xp: Namespace) -> bool:
+    return "copy" in inspect.signature(xp.reshape).parameters
+
+
 # np.reshape calls the keyword argument 'newshape' instead of 'shape'
 def reshape(
     x: Array,
@@ -457,6 +461,8 @@ def reshape(
     if copy is True:
         x = x.copy()
     elif copy is False:
+        if _reshape_supports_copy(xp):
+            return xp.reshape(x, shape, copy=False, **kwargs)
         y = x.view()
         y.shape = shape
         return y

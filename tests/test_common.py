@@ -1,4 +1,5 @@
 import math
+import warnings
 
 import pytest
 import numpy as np
@@ -17,6 +18,7 @@ from array_api_compat import (  # noqa: F401
 from array_api_compat import (
     device, is_array_api_obj, is_lazy_array, is_writeable_array, size, to_device
 )
+from array_api_compat.common._aliases import reshape
 from array_api_compat.common._helpers import _DASK_DEVICE
 from ._helpers import all_libraries, import_, wrapped_libraries, xfail
 
@@ -376,3 +378,18 @@ def test_clip_out(library):
     xp.clip(x, 15, 25, out=out)
     expect = xp.asarray([15, 20, 25])
     assert xp.all(out == expect)
+
+
+def test_reshape_copy_false_returns_a_view_without_deprecation():
+    x = np.arange(12)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        y = reshape(x, (3, 4), xp=np, copy=False)
+
+    assert y.shape == (3, 4)
+    assert np.shares_memory(x, y)
+
+
+def test_reshape_copy_false_rejects_an_input_that_needs_a_copy():
+    with pytest.raises((ValueError, AttributeError)):
+        reshape(np.arange(12).reshape(3, 4).T, (2, 6), xp=np, copy=False)
