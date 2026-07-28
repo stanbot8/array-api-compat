@@ -186,3 +186,9 @@ def test_sort_argsort_meta(xp, func):
     # Note: np.sort(array_api_strict.asarray(0)) would return a numpy array
     assert isinstance(d, typ)
     np.testing.assert_array_equal(d, getattr(np, func)(a.compute()))
+
+
+def test_reshape_copy_false_rejects_every_input(xp):
+    a = da.from_array(np.arange(12), chunks=6)
+    with pytest.raises(ValueError):
+        xp.reshape(a, (3, 4), copy=False)

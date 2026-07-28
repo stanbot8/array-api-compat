@@ -129,7 +129,22 @@ ones = get_xp(da)(_aliases.ones)
 ones_like = get_xp(da)(_aliases.ones_like)
 zeros = get_xp(da)(_aliases.zeros)
 zeros_like = get_xp(da)(_aliases.zeros_like)
-reshape = get_xp(da)(_aliases.reshape)
+_reshape = get_xp(da)(_aliases.reshape)
+
+
+def reshape(
+    x: Array,
+    /,
+    shape: tuple[int, ...],
+    *,
+    copy: py_bool | None = None,
+    **kwargs: object
+) -> Array:
+    if copy is False:
+        raise ValueError("Unable to avoid creating a copy while reshaping.")
+    return _reshape(x, shape, copy=copy, **kwargs)
+
+
 matrix_transpose = get_xp(da)(_aliases.matrix_transpose)
 vecdot = get_xp(da)(_aliases.vecdot)
 nonzero = get_xp(da)(_aliases.nonzero)
