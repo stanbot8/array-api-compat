@@ -19,6 +19,19 @@ def xp():
     return array_namespace(da.empty(0))
 
 
+def test_reshape_copy_false(xp):
+    array = da.arange(12, chunks=12)
+    result = xp.reshape(array, (3, 4), copy=False)
+    np.testing.assert_array_equal(result.compute(), np.arange(12).reshape(3, 4))
+
+    with pytest.raises(ValueError, match="Unable to avoid"):
+        xp.reshape(da.arange(12, chunks=4), (3, 4), copy=False)
+
+    transposed = da.arange(12, chunks=12).reshape((3, 4)).T
+    with pytest.raises(ValueError, match="Unable to avoid"):
+        xp.reshape(transposed, (12,), copy=False).compute()
+
+
 @contextmanager
 def assert_no_compute():
     """

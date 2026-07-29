@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from typing_extensions import TypeIs
 
+from dask import delayed
 import dask.array as da
 import numpy as np
 from numpy import bool_ as bool
@@ -129,7 +130,55 @@ ones = get_xp(da)(_aliases.ones)
 ones_like = get_xp(da)(_aliases.ones_like)
 zeros = get_xp(da)(_aliases.zeros)
 zeros_like = get_xp(da)(_aliases.zeros_like)
-reshape = get_xp(da)(_aliases.reshape)
+
+
+def _reshape_block_no_copy(array: Any, shape: tuple[int, ...]) -> Any:
+    if (
+        isinstance(array, np.ndarray)
+        and np.lib.NumpyVersion(np.__version__) >= "2.1.0"
+    ):
+        return np.reshape(array, shape, copy=False)
+    view = array.view()
+    try:
+        view.shape = shape
+    except (AttributeError, ValueError) as error:
+        raise ValueError("Unable to avoid a copy while reshaping.") from error
+    return view
+
+
+def _reshape_no_copy(
+    x: Array,
+    shape: tuple[int, ...],
+    **kwargs: object,
+) -> Array:
+    reshaped = da.reshape(x, shape, **kwargs)
+    if x.shape == reshaped.shape:
+        return x
+    if x.npartitions != 1:
+        raise ValueError("Unable to avoid a copy while reshaping.")
+    block = x.to_delayed().ravel()[0]
+    value = delayed(_reshape_block_no_copy)(block, reshaped.shape)
+    return da.from_delayed(
+        value,
+        shape=reshaped.shape,
+        dtype=x.dtype,
+        meta=reshaped._meta,
+    )
+
+
+def reshape(x: Array,
+            /,
+            shape: tuple[int, ...],
+            *,
+            copy: py_bool | None = None,
+            **kwargs: object) -> Array:
+    if copy is True:
+        x = x.copy()
+    if copy is False:
+        return _reshape_no_copy(x, shape, **kwargs)
+    return da.reshape(x, shape, **kwargs)
+
+
 matrix_transpose = get_xp(da)(_aliases.matrix_transpose)
 vecdot = get_xp(da)(_aliases.vecdot)
 nonzero = get_xp(da)(_aliases.nonzero)
