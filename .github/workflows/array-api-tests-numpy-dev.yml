@@ -7,17 +7,16 @@ jobs:
     uses: ./.github/workflows/array-api-tests.yml
     with:
       package-name: numpy
-      extra-requires: --pre --extra-index 
-        https://pypi.anaconda.org/scientific-python-nightly-wheels/simple
-      xfails-file-extra: -dev
-      python-versions: "['3.11', '3.13', '3.14']"
+      extra-requires: '--pre --extra-index https://pypi.anaconda.org/scientific-python-nightly-wheels/simple'
+      xfails-file-extra: '-dev'
+      python-versions: '[''3.11'', ''3.13'', ''3.14'']'
       pytest-extra-args: -n 4
       extra-env-vars: |
         ARRAY_API_TESTS_XFAIL_MARK=skip
     needs:
     - alpha_bridge_inputs
-    if: ${{ (success()) && needs.alpha_bridge_inputs.outputs.changed == 'true' 
-      }}
+    if: |-
+      ${{ (success()) && needs.alpha_bridge_inputs.outputs.changed == 'true' }}
   alpha_bridge_inputs:
     name: CI input check
     runs-on: ubuntu-latest
@@ -43,7 +42,7 @@ jobs:
         AB_REF: ${{ (github.event_name == 'schedule' || github.event_name == 
           'workflow_run') && 'refs/heads/main' || github.ref }}
         AB_WORKFLOW_DIGEST: 
-          0d80b4d1ee6d7f14b9dc09c0eeb71ab4156be4323079740b6ff57593c2b7f250
+          06f9ed4103bb023dfd7736ea50be96cf09a767e60edf38c6cb3bc50c678df7fe
         AB_EVENT: ${{ github.event_name }}
         AB_SCHEDULE: ${{ github.event.schedule || '' }}
         AB_VARIABLES: ${{ toJSON(vars) }}

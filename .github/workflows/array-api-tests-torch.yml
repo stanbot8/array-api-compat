@@ -7,16 +7,16 @@ jobs:
     uses: ./.github/workflows/array-api-tests.yml
     with:
       package-name: torch
-      extra-requires: --index-url https://download.pytorch.org/whl/cpu
+      extra-requires: '--index-url https://download.pytorch.org/whl/cpu'
       extra-env-vars: |
         ARRAY_API_TESTS_SKIP_DTYPES=uint16,uint32,uint64
         ARRAY_API_TESTS_XFAIL_MARK=skip
-      python-versions: "['3.10', '3.13', '3.14']"
+      python-versions: '[''3.10'', ''3.13'', ''3.14'']'
       pytest-extra-args: -n 4
     needs:
     - alpha_bridge_inputs
-    if: ${{ (success()) && needs.alpha_bridge_inputs.outputs.changed == 'true' 
-      }}
+    if: |-
+      ${{ (success()) && needs.alpha_bridge_inputs.outputs.changed == 'true' }}
   alpha_bridge_inputs:
     name: CI input check
     runs-on: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
         AB_REF: ${{ (github.event_name == 'schedule' || github.event_name == 
           'workflow_run') && 'refs/heads/main' || github.ref }}
         AB_WORKFLOW_DIGEST: 
-          a3bbdf4f7458c588654b35974fc1e5c17a92f78883e194f935450cbbd0741145
+          a34591875f66ced644e19cd492ab7f47fd59c7a8d148e71b1b46473ac618b167
         AB_EVENT: ${{ github.event_name }}
         AB_SCHEDULE: ${{ github.event.schedule || '' }}
         AB_VARIABLES: ${{ toJSON(vars) }}

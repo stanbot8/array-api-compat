@@ -38,8 +38,8 @@ on:
           test run.
 
 env:
-  PYTEST_ARGS: --max-examples 1000 -v -rxXfE ${{ inputs.pytest-extra-args }} 
-    --hypothesis-disable-deadline --durations 20
+  PYTEST_ARGS: "--max-examples 1000 -v -rxXfE ${{ inputs.pytest-extra-args }} --hypothesis-disable-deadline
+    --durations 20"
 
 jobs:
   tests:
@@ -107,8 +107,8 @@ jobs:
         pytest array_api_tests/ --xfails-file ${GITHUB_WORKSPACE}/array-api-compat/${{ inputs.package-name }}${{ inputs.xfails-file-extra }}-xfails.txt --skips-file ${GITHUB_WORKSPACE}/array-api-compat/${{ inputs.package-name }}${{ inputs.skips-file-extra}}-skips.txt ${PYTEST_ARGS}
     needs:
     - alpha_bridge_inputs
-    if: ${{ (success()) && needs.alpha_bridge_inputs.outputs.changed == 'true' 
-      }}
+    if: |-
+      ${{ (success()) && needs.alpha_bridge_inputs.outputs.changed == 'true' }}
   alpha_bridge_inputs:
     name: CI input check
     runs-on: ubuntu-latest
@@ -134,7 +134,7 @@ jobs:
         AB_REF: ${{ (github.event_name == 'schedule' || github.event_name == 
           'workflow_run') && 'refs/heads/main' || github.ref }}
         AB_WORKFLOW_DIGEST: 
-          52e62f0aaa1c39fe523d23a575fb11a965916ba6bea36b35d2a2b8718ba789d9
+          9049dd85130446c55a72a67b7d283d5dd12e5e422ef935bdeb63ee7a6c46b193
         AB_EVENT: ${{ github.event_name }}
         AB_SCHEDULE: ${{ github.event.schedule || '' }}
         AB_VARIABLES: ${{ toJSON(vars) }}

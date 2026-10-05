@@ -15,7 +15,7 @@ on:
     inputs:
       publish:
         type: choice
-        description: Publish to TestPyPI?
+        description: 'Publish to TestPyPI?'
         options:
         - false
         - true
@@ -42,7 +42,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v7.0.0
       with:
-        python-version: 3.x
+        python-version: '3.x'
 
     - name: Install python-build and twine
       run: |
@@ -78,13 +78,12 @@ jobs:
 
     needs:
     - alpha_bridge_inputs
-    if: ${{ (success()) && needs.alpha_bridge_inputs.outputs.changed == 'true' 
-      }}
+    if: |-
+      ${{ (success()) && needs.alpha_bridge_inputs.outputs.changed == 'true' }}
   publish:
     name: Publish Python distribution to (Test)PyPI
-    if: ${{ (github.event_name != 'pull_request' && github.repository == 
-      'data-apis/array-api-compat' && github.ref_type == 'tag') && 
-      needs.alpha_bridge_inputs.outputs.changed == 'true' }}
+    if: |-
+      ${{ (github.event_name != 'pull_request' && github.repository == 'data-apis/array-api-compat' && github.ref_type == 'tag') && needs.alpha_bridge_inputs.outputs.changed == 'true' }}
     needs:
     - build
     - alpha_bridge_inputs
@@ -160,7 +159,7 @@ jobs:
         AB_REF: ${{ (github.event_name == 'schedule' || github.event_name == 
           'workflow_run') && 'refs/heads/main' || github.ref }}
         AB_WORKFLOW_DIGEST: 
-          048290a00487d12fc55053a532fb9bc967880c973441b541028b8ad5adb5c18e
+          64cdcb7b1800b793b5a1caf2b040ebd41742cbf47b7a24a641821fccfbfe4e85
         AB_EVENT: ${{ github.event_name }}
         AB_SCHEDULE: ${{ github.event.schedule || '' }}
         AB_VARIABLES: ${{ toJSON(vars) }}

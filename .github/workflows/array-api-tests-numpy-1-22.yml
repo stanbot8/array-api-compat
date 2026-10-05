@@ -7,16 +7,16 @@ jobs:
     uses: ./.github/workflows/array-api-tests.yml
     with:
       package-name: numpy
-      package-version: == 1.22.*
-      xfails-file-extra: -1-22
-      python-versions: "['3.10']"
+      package-version: '== 1.22.*'
+      xfails-file-extra: '-1-22'
+      python-versions: '[''3.10'']'
       pytest-extra-args: -n 4
       extra-env-vars: |
         ARRAY_API_TESTS_XFAIL_MARK=skip
     needs:
     - alpha_bridge_inputs
-    if: ${{ (success()) && needs.alpha_bridge_inputs.outputs.changed == 'true' 
-      }}
+    if: |-
+      ${{ (success()) && needs.alpha_bridge_inputs.outputs.changed == 'true' }}
   alpha_bridge_inputs:
     name: CI input check
     runs-on: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
         AB_REF: ${{ (github.event_name == 'schedule' || github.event_name == 
           'workflow_run') && 'refs/heads/main' || github.ref }}
         AB_WORKFLOW_DIGEST: 
-          6f9c4cd3101b9e985c1c1bb0e6c9487a3b3cced9b0707de63c6b72d0a5324fc5
+          3cd31677640b4f33bed4ddfdda7c5037951fece58b447789aefb8d7c17da269d
         AB_EVENT: ${{ github.event_name }}
         AB_SCHEDULE: ${{ github.event.schedule || '' }}
         AB_VARIABLES: ${{ toJSON(vars) }}

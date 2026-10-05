@@ -15,13 +15,13 @@ jobs:
       # flakiness. Before changes to dask-xfails.txt or dask-skips.txt, please run
       # the full test suite with at least 200 examples.
       pytest-extra-args: --max-examples=200 -n 4
-      python-versions: "['3.10', '3.13']"
+      python-versions: '[''3.10'', ''3.13'']'
       extra-env-vars: |
         ARRAY_API_TESTS_XFAIL_MARK=skip
     needs:
     - alpha_bridge_inputs
-    if: ${{ (success()) && needs.alpha_bridge_inputs.outputs.changed == 'true' 
-      }}
+    if: |-
+      ${{ (success()) && needs.alpha_bridge_inputs.outputs.changed == 'true' }}
   alpha_bridge_inputs:
     name: CI input check
     runs-on: ubuntu-latest
@@ -47,7 +47,7 @@ jobs:
         AB_REF: ${{ (github.event_name == 'schedule' || github.event_name == 
           'workflow_run') && 'refs/heads/main' || github.ref }}
         AB_WORKFLOW_DIGEST: 
-          889cb2ca39920945d5049fe5efddffb2a35beb3f686aeb1bee9631415d263008
+          b9d618e0608604eeb28f96dd8092105f130e61894d097464b9240e418f03c7c4
         AB_EVENT: ${{ github.event_name }}
         AB_SCHEDULE: ${{ github.event.schedule || '' }}
         AB_VARIABLES: ${{ toJSON(vars) }}
