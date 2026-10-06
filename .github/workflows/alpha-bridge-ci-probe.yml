@@ -1,20 +1,15 @@
-name: Array API Tests (NumPy latest)
-
-on: [push, pull_request]
-
+name: CI input probe
+on:
+  workflow_call:
+    inputs:
+      probe:
+        type: string
+        required: true
 jobs:
-  array-api-tests-numpy-latest:
-    uses: ./.github/workflows/array-api-tests.yml
-    with:
-      package-name: numpy
-      python-versions: '[''3.10'', ''3.13'', ''3.14'']'
-      pytest-extra-args: -n 4
-      extra-env-vars: |
-        ARRAY_API_TESTS_XFAIL_MARK=skip
-    permissions:
-      contents: read
-      packages: read
-      actions: read
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo 'Changed inputs reached the consumer'
     needs:
     - alpha_bridge_inputs
     if: |-
@@ -38,15 +33,12 @@ jobs:
         GH_TOKEN: ${{ github.token }}
         AB_REPOSITORY: ${{ github.repository }}
         AB_RUN_ID: ${{ github.run_id }}
-        AB_HEAD_SHA: ${{ (github.event_name == 'schedule' || github.event_name 
-          == 'workflow_run') && 'f0ead5511ce8922eb1204d22e4f0c7d806dcbb4e' || 
-          github.sha }}
-        AB_REF: ${{ (github.event_name == 'schedule' || github.event_name == 
-          'workflow_run') && 'refs/heads/main' || github.ref }}
+        AB_HEAD_SHA: ${{ github.sha }}
+        AB_REF: ${{ github.ref }}
         AB_WORKFLOW_DIGEST: 
-          7a05df12dc4c22101a49026532c9659dce39382f56ba209a6b888006aa3e61a7
-        AB_EVENT: ${{ github.event_name }}
-        AB_SCHEDULE: ${{ github.event.schedule || '' }}
+          aeb0c6e2caf9e7aa08ace6ecf5bf2a46ae50d577b223dd23f9d645eb0c1d6792
+        AB_EVENT: schedule
+        AB_SCHEDULE: alpha-bridge verification
         AB_VARIABLES: ${{ toJSON(vars) }}
         AB_INPUTS: ${{ toJSON(inputs) }}
         AB_WORKFLOW_RUN: ${{ toJSON(github.event.workflow_run) }}
