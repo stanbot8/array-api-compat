@@ -1,22 +1,18 @@
-name: Array API Tests (NumPy 1.26)
-
-on: [push, pull_request]
-
+name: CI input consumer
+on:
+  workflow_call:
+    inputs:
+      probe:
+        type: string
+        required: true
+      slot:
+        type: string
+        required: true
 jobs:
-  array-api-tests-numpy-latest:
-    uses: ./.github/workflows/array-api-tests.yml
-    with:
-      package-name: numpy
-      package-version: '== 1.26.*'
-      xfails-file-extra: '-1-26'
-      python-versions: '[''3.10'', ''3.12'']'
-      pytest-extra-args: -n 4
-      extra-env-vars: |
-        ARRAY_API_TESTS_XFAIL_MARK=skip
-    permissions:
-      contents: read
-      packages: read
-      actions: read
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo 'Changed inputs reached consumer ${{ inputs.slot }}'
     needs:
     - alpha_bridge_inputs
     if: |-
@@ -28,7 +24,7 @@ jobs:
       actions: read
       contents: read
     concurrency:
-      group: alpha-bridge-inputs-b2798f51a26b3d61-${{ github.workflow }}-${{ 
+      group: alpha-bridge-inputs-04fbff4179fd2373-${{ github.workflow }}-${{ 
         github.sha }}-${{ github.event.schedule || github.event_name }}
       cancel-in-progress: false
       queue: max
@@ -41,13 +37,10 @@ jobs:
         GH_TOKEN: ${{ github.token }}
         AB_REPOSITORY: ${{ github.repository }}
         AB_RUN_ID: ${{ github.run_id }}
-        AB_HEAD_SHA: ${{ (github.event_name == 'schedule' || github.event_name 
-          == 'workflow_run') && 'f0ead5511ce8922eb1204d22e4f0c7d806dcbb4e' || 
-          github.sha }}
-        AB_REF: ${{ (github.event_name == 'schedule' || github.event_name == 
-          'workflow_run') && 'refs/heads/main' || github.ref }}
+        AB_HEAD_SHA: ${{ github.sha }}
+        AB_REF: ${{ github.ref }}
         AB_WORKFLOW_DIGEST: 
-          bb0bd550d852f5b1fea08e0043e75cda76b4f92c8a81acfa54df260ca16fdc67
+          204202fd1f1fa08793779bf1cda80736b14fcfc47bf1262b68cdcee1a843ad8c
         AB_EVENT: ${{ github.event_name }}
         AB_SCHEDULE: ${{ github.event.schedule || '' }}
         AB_VARIABLES: ${{ toJSON(vars) }}
